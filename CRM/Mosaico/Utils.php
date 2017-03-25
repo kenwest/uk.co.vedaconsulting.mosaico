@@ -342,8 +342,8 @@ class CRM_Mosaico_Utils {
         if($mosTpl->find(TRUE)){
           $msgTplId = $mosTpl->msg_tpl_id;
         }
-
-        $name = "Mosaico " . date('d-m-Y H:i:s');
+		
+        $name = "Mosaico Template " . date('d-m-Y H:i:s'); 
         if (CRM_Utils_Type::escape($_POST['name'], 'String')) {
           $name = $_POST['name'];
         }

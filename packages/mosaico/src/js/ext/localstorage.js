@@ -39,7 +39,7 @@ var lsCommandPluginFactory = function(md, emailProcessorBackend) {
       var fulldate = date.toLocaleDateString('en-GB',options);
 
       var metaName = global.localStorage.getItem("name-" + mdkey);
-      if (!metaName || metaName == 'null') metaName   = viewModel.t('Mosaico ' + fulldate);
+      if (!metaName || metaName == 'null') metaName   = viewModel.t('Mosaico Template ' + fulldate);
       metaName = global.prompt(viewModel.t("Please enter the Message title"), metaName);
       viewModel.metadata.name = metaName;
       global.localStorage.setItem("name-" + mdkey, metaName);
