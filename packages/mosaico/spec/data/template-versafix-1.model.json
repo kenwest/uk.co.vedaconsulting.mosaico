@@ -64,7 +64,7 @@
     "type": "theme",
     "frameTheme": {
       "type": "frameTheme",
-      "backgroundColor": "#3f3f3f",
+      "backgroundColor": "#ffffff",
       "longTextStyle": {
         "type": "longTextStyle",
         "face": "Arial, Helvetica, sans-serif",
@@ -89,7 +89,7 @@
         "size": "13",
         "linksColor": "#3f3f3f"
       },
-      "externalBackgroundColor": "#bfbfbf",
+      "externalBackgroundColor": "#ffffff",
       "externalTextStyle": {
         "type": "textStyle",
         "face": "Arial, Helvetica, sans-serif",

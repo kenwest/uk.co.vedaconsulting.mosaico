@@ -22,17 +22,23 @@ class CRM_Mosaico_Utils {
         /* local file system base path to where image directories are located */
         'BASE_DIR' => $civiConfig->imageUploadDir,
 
+          /* url to the static images folder (relative to BASE_URL) */
+          'UPLOADS_URL' => "images/uploads/",
+
+          /* local file system path to the static images folder (relative to BASE_DIR) */
+          'UPLOADS_DIR' => "images/uploads/",
+
         /* url to the static images folder (relative to BASE_URL) */
-        'STATIC_URL' => "static/",
+        'STATIC_URL' => "images/uploads/static/",
 
         /* local file system path to the static images folder (relative to BASE_DIR) */
-        'STATIC_DIR' => "static/",
+        'STATIC_DIR' => "images/uploads/static/",
 
         /* url to the thumbnail images folder (relative to'BASE_URL'*/
-        'THUMBNAILS_URL' => "uploads/thumbnails/",
+        'THUMBNAILS_URL' => "images/uploads/thumbnails/",
 
         /* local file system path to the thumbnail images folder (relative to BASE_DIR) */
-        'THUMBNAILS_DIR' => "uploads/thumbnails/",
+        'THUMBNAILS_DIR' => "images/uploads/thumbnails/",
 
         /* width and height of generated thumbnails */
         'THUMBNAIL_WIDTH' => 90,
@@ -64,7 +70,7 @@ class CRM_Mosaico_Utils {
         //issue - https://github.com/veda-consulting/uk.co.vedaconsulting.mosaico/issues/28
         //Change file name to unique by adding hash so every time uploading same image it will create new image name
         $file_name = CRM_Utils_File::makeFileName($file_name);
-        $file_path = $config['BASE_DIR'] . $file_name;
+        $file_path = $config['BASE_DIR'].$config['UPLOADS_DIR'] . $file_name;
 
         if ( is_file( $file_path ) )
         {
@@ -72,13 +78,13 @@ class CRM_Mosaico_Utils {
 
           $file = [
             "name" => $file_name,
-            "url" => $config['BASE_URL'] . $file_name,
+            "url" => $config['BASE_URL'].$config['UPLOADS_DIR'] . $file_name,
             "size" => $size
           ];
 
-          if ( file_exists( $config['BASE_DIR'] . $config[ THUMBNAILS_DIR ] . $file_name ) )
+          if ( file_exists( $config['BASE_DIR'] . $config[ 'THUMBNAILS_DIR' ] . $file_name ) )
           {
-            $file[ "thumbnailUrl" ] = $config['BASE_URL'] . $config[ THUMBNAILS_URL ] . $file_name;
+            $file[ "thumbnailUrl" ] = $config['BASE_URL'] . $config[ 'THUMBNAILS_URL' ] . $file_name;
           }
 
           $files[] = $file;
@@ -98,7 +104,7 @@ class CRM_Mosaico_Utils {
           //Change file name to unique by adding hash so every time uploading same image it will create new image name
           $file_name = CRM_Utils_File::makeFileName($file_name);
 
-          $file_path = $config['BASE_DIR'] . $file_name;
+          $file_path = $config['BASE_DIR'].$config['UPLOADS_DIR'] . $file_name;
 
           if ( move_uploaded_file( $tmp_name, $file_path ) === TRUE )
           {
@@ -106,18 +112,18 @@ class CRM_Mosaico_Utils {
 
             $image = new Imagick( $file_path );
 
-            $image->resizeImage( $config[ THUMBNAIL_WIDTH ], $config[ THUMBNAIL_HEIGHT ], Imagick::FILTER_LANCZOS, 1.0, TRUE );
+            $image->resizeImage( $config[ 'THUMBNAIL_WIDTH' ], $config[ 'THUMBNAIL_HEIGHT' ], Imagick::FILTER_LANCZOS, 1.0, TRUE );
             // $image->writeImage( $config['BASE_DIR'] . $config[ THUMBNAILS_DIR ] . $file_name );
-            if($f = fopen( $config['BASE_DIR'] . $config[ THUMBNAILS_DIR ] . $file_name, "w")){
+            if($f = fopen( $config['BASE_DIR'] . $config[ 'THUMBNAILS_DIR' ] . $file_name, "w")){
               $image->writeImageFile($f);
             }            
             $image->destroy();
 
             $file = array(
               "name" => $file_name,
-              "url" => $config['BASE_URL'] . $file_name,
+              "url" => $config['BASE_URL'].$config['UPLOADS_DIR'] . $file_name,
               "size" => $size,
-              "thumbnailUrl" => $config['BASE_URL'] . $config[ THUMBNAILS_URL ] . $file_name
+              "thumbnailUrl" => $config['BASE_URL'] . $config[ 'THUMBNAILS_URL' ] . $file_name
             );
 
             $files[] = $file;
@@ -270,7 +276,7 @@ class CRM_Mosaico_Utils {
         if ( preg_match( '#/img/(\?|&amp;)src=(.*)&amp;method=(.*)&amp;params=(.*)#i', $matches[ 1 ][ $i ], $src_matches ) !== FALSE )
         {
           $file_name = urldecode( $src_matches[ 2 ] );
-          $file_name = substr( $file_name, strlen( $config['BASE_URL'] ) );
+          $file_name = substr( $file_name, strlen( $config['BASE_URL'].$config['UPLOADS_DIR'] ) );
 
           $method = urldecode( $src_matches[ 3 ] );
 
@@ -285,7 +291,11 @@ class CRM_Mosaico_Utils {
 
           $image = self::resizeImage( $file_name, $method, $width, $height );
 
-          $image->writeImage( $config['BASE_DIR'] . $config['STATIC_DIR'] . $static_file_name );
+          //not needed (resizeImage() now stores a static version if one doesn't already exist
+          //save image for next time so don't need to resize each time
+          /*if($f = fopen( $config['BASE_DIR'] . $config[ 'STATIC_DIR' ] . $file_name, "w")){
+            $image->writeImageFile($f);
+          }*/
         }
       }
     }
@@ -423,7 +433,13 @@ class CRM_Mosaico_Utils {
     $mobileMinWidth = 246;
     $config = self::getConfig();
 
-    $image = new Imagick( $config['BASE_DIR'] . $file_name );
+	if(file_exists($config['BASE_DIR'].$config['STATIC_DIR'] . $file_name)){
+	  //use existing file
+	  $image = new Imagick($config['BASE_DIR'] . $config['STATIC_DIR'] . $file_name);
+
+    } else {
+	
+    $image = new Imagick( $config['BASE_DIR'].$config['UPLOADS_DIR'] . $file_name );
 
     if ( $method == "resize" )
     {
@@ -471,6 +487,12 @@ class CRM_Mosaico_Utils {
 
       $image->cropImage( $width, $height, $x, $y );
     }
+	//save image for next time so don't need to resize each time
+	if ($f = fopen($config['BASE_DIR'] . $config['STATIC_DIR'] . $file_name, "w")) {
+		$image->writeImageFile($f);
+	}
+	
+	}
 
     return $image;
   }

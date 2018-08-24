@@ -158,7 +158,7 @@ function mosaico_civicrm_navigationMenu(&$params){
   //$msgTpls  = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Message Templates', 'id', 'name');
 
   $maxId       = max(array_keys($params));
-  $msgTplMaxId = empty($msgTpls) ? $maxId+1 : $msgTpls;
+  $msgTplMaxId = empty($msgTpls) ? $maxId+10 : $msgTpls;
   $params[$parentId]['child'][$msgTplMaxId] = array(
     'attributes' => array(
       'label'     => ts('Message Template Builder'),
@@ -168,7 +168,7 @@ function mosaico_civicrm_navigationMenu(&$params){
       'parentID'  => $parentId,
       'operator'  => NULL,
       'navID'     => $msgTplMaxId,
-      'permission'=> 'administer CiviCRM',
+      'permission'=> 'edit message templates',
     ),
   );
 }
@@ -256,4 +256,17 @@ function mosaico_civicrm_check(&$messages) {
       \Psr\Log\LogLevel::CRITICAL
     );
   }
+}
+
+/**
+ * Implementation of hook_civicrm_permission
+ *
+ * @param array $permissions
+ * @return void
+ */
+function mosaico_civicrm_permission(&$permissions) {
+    $prefix = ts('CiviMail Mosaico') . ': '; // name of extension or module
+    $permissions += array(
+        'access CiviCRM Mosaico' => $prefix . ts('access CiviCRM Mosaico'),
+    );
 }
