@@ -168,7 +168,7 @@ function mosaico_civicrm_navigationMenu(&$params){
       'parentID'  => $parentId,
       'operator'  => NULL,
       'navID'     => $msgTplMaxId,
-      'permission'=> 'edit message templates',
+      'permission'=> 'access CiviCRM Mosaico',
     ),
   );
 }
